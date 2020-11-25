@@ -4,88 +4,45 @@
 if exists('g:loaded_MvVis') | finish | endif
 let s:cpo_save = &cpo | set cpo&vim
 
-function! s:moveLines(d, c, lines_N) abort
-  if a:d == 'h'
-    execute 'normal! ' . a:c . 'k"sP'
-  else
-    if a:c > 1
-      execute 'normal! ' . (a:c-1) . 'j'
-    endif
-    normal! "sp
-  endif
-
-  normal! V
-  if a:lines_N > 1
-    execute "normal! " . (a:lines_N-1) . "jo"
-  endif
-endfunction
-
-function! s:moveInline(d, c, lines_N, lines, m, flag) abort
-  execute "normal! " . a:c . a:d
-
-  if a:d == 'l' && a:flag
-    normal! "sp
-  else
-    if a:d == 'h' && a:flag
-      normal! l
-    endif
-    normal! "sP
-  endif
-
-  let maxLine = 1
-  for x in a:lines
-    if strchars(x) > maxLine
-      let maxLine = strchars(x)
-    endif
-  endfor
-  if maxLine > 1
-    let maxLine -= 1
-  endif
-
-  if a:lines_N > 1
-    execute "normal! \<C-v>" . (a:lines_N-1) . "j" . maxLine . "lo"
-  else
-    if a:m == "\<C-v>"
-      execute "normal! \<C-v>" . maxLine . "lo"
-    else
-      execute "normal! v" . maxLine . "ho"
-    endif
-  endif
-endfunction
-
 function! s:MvVis(d) abort range
   let c = v:count1
+  norm! gv
 
-  normal! gv
   let m = mode()
+  let m = m ==# "V" ? 2 : (m ==# "v" ? 0 : 1)
 
-  if a:d == 'h'
-    if (m ==# "v" || m == "\<C-v>") && virtcol('.') == 0
-      return
-    elseif m ==# "V" && line('.') == 1
-      return
-    endif
-  else
-    if (m ==# "v" || m == "\<C-v>") && virtcol('.') == virtcol('$')-1
-      return
-    endif
-  endif
+  let d = m < 2 ? a:d : (a:d == 'h' ? 'k' : 'j')
+
+  if d == 'l' && virtcol('.') == virtcol('$')-1 | return | endif
 
   let s_old = @s
-  let flag = virtcol('.') == virtcol('$') - (a:d == 'h' ? 1 : 2)
 
-  normal! "sd
-
-  let lines = split(@s, "\n")
-  let lines_N = len(lines)
-
-  if m ==# "V"
-    call s:moveLines(a:d, c, lines_N)
+  if m < 2
+    let flag = virtcol('.') == virtcol('$') - (d == 'h' ? 1 : 2)
   else
-    call s:moveInline(a:d, c, lines_N, lines, m, flag)
+    let flag = line('.') >= line('$') - (d == 'j' ? 1 : 0)
   endif
 
-  let @s = s_old
+  norm! "sd
+
+  let lines = split(@s, "\n")
+  let lines_N = len(lines) - 1
+
+  exec 'norm! ' . c . d
+  exec 'norm! "s' . (flag ? 'p' : 'P')
+  let @s = s_old " why previous two statements cannot be combined I have no idea
+
+  if m == 2 " reselect lines
+    norm! V
+    if lines_N > 0 | exec "norm! " . lines_N . "j" | endif
+  else " reselect horizontal selection
+    let lh = strchars(lines[0])-1
+    if m == 0
+      exec "norm! v" . lh . "ho"
+    else
+      exec "norm! \<C-v>" . (lines_N > 0 ? lines_N . "j" : "") . lh . "l"
+    endif
+  endif
 endfunction
 
 vnoremap <silent> <Plug>(MvVisLeft)  :<C-u>call <SID>MvVis('h')<CR>

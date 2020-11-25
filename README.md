@@ -7,7 +7,7 @@ Move visually selected text
 
 ## Installation
 
-Use your favourite plugin manager to install miniSnip:
+Use your favourite plugin manager:
 
 #### [minPlug](https://github.com/Jorengarenar/minPlug):
 ```vim

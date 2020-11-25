@@ -27,19 +27,19 @@ git clone git://github.com/Jorengarenar/vim-MvVis.git
 
 ## Usage
 
-Pressing <kbd>H</kbd>/<kbd>L</kbd> will shift your selection one column to the
-left/right. Pressing number then <kbd>H</kbd>/<kbd>L</kbd> will move selection
-by that amount of columns.
+In visual mode, press <kbd>CTRL</kbd> and one of directional keys (<kbd>H</kbd>,
+<kbd>J</kbd>, <kbd>K</kbd>, <kbd>L</kbd>) to move selected text.
 
-Same goes for visual block selection.
-
-In case of line selection, instead of columns, selection will be moved up/down.
+You can also provide a number of amount of places you want to move it, e.g.
+to move selection three columns to the left press `3<C-h>`.
 
 ## Configuration
 
-To disable default mappings (<kbd>H</kbd>, <kbd>L</kbd>) set variable
-`g:MvVis_mappings` to `0` and define your own, e.g.:
+To disable default mappings set variable `g:MvVis_mappings` to `0` and define
+your own, e.g.:
 ```vim
-vmap <C-h> <Plug>(MvVisLeft)
-vmap <C-l> <Plug>(MvVisRight)
+vmap H <Plug>(MvVisLeft)
+vmap J <Plug>(MvVisDown)
+vmap K <Plug>(MvVisUp)
+vmap L <Plug>(MvVisRight)
 ```

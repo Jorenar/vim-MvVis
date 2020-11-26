@@ -24,21 +24,28 @@ function! s:MvVis(d) abort range
   norm! "sd
 
   let lines = split(@s, "\n")
-  let lines_N = len(lines) - 1
+  let n = len(lines) - 1
+
+  if n < 0
+    let [ @s, lines, m ] = [ "\n", "", 2 ]
+  elseif m == 0 && n > 0
+    let m = 2
+    exec 'norm! uV' . n . 'j"sd'
+  endif
 
   exec 'norm! ' . c . a:d
   exec 'norm! "s' . (flag ? 'p' : 'P')
-  let @s = s_old " why previous two statements cannot be combined I have no idea
+  let @s = s_old
 
-  if m == 2 " reselect lines
+  if m == 2
     norm! V
-    if lines_N > 0 | exec "norm! " . lines_N . "j" | endif
-  else " reselect horizontal selection
+    if n > 0 | exec "norm! " . n . "j" | endif
+  else
     let lh = strchars(lines[0])-1
     if m == 0
-      exec "norm! v" . lh . "ho"
+      exec "norm! v" . (lh > 0 ? lh . "ho" : "")
     else
-      exec "norm! \<C-v>" . (lines_N > 0 ? lines_N . "j" : "") . lh . "l"
+      exec "norm! \<C-v>" . (n > 0 ? n . "j" : "") . (lh > 0 ? lh . "l" : "")
     endif
   endif
 endfunction

@@ -7,11 +7,6 @@ Move visually selected text
 
 ## Installation
 
-#### [minPlug](https://github.com/Jorengarenar/minPlug):
-```vim
-MinPlug Jorengarenar/vim-MvVis
-```
-
 #### [vim-plug](https://github.com/junegunn/vim-plug):
 ```vim
 Plug 'Jorengarenar/vim-MvVis'
